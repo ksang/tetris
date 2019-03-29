@@ -17,6 +17,10 @@ It is currently work in progress.
     6 : rotate clockwise
     7 : hold/dequeue
 
+### Install dependencies
+
+    pip install -r requirements.txt
+
 ### Import as Gym RL environment
 
     import tetris
