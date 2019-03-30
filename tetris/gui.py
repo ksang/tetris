@@ -71,9 +71,9 @@ k : rotate clockwise
 l : hold"""
         self.side_board.create_text(int(GUI_HEIGHT*3/8), 80, text=help_text)
         # Display score
-        self.score = self.side_board.create_text(50, GUI_HEIGHT-20,
-                                        text="Score: 0",
-                                        font="Arial 20 bold")
+        self.score = self.side_board.create_text(92, GUI_HEIGHT-12,
+                                        text="Score: 0000000000",
+                                        font="Helvetica 20 bold")
 
         # Next queue backgrounds
         self.side_board.create_rectangle(0,0,
@@ -99,7 +99,8 @@ l : hold"""
         self.window.quit()
 
     def update_score(self):
-        self.side_board.itemconfig(self.score, text="Score: " + str(self.tetris.get_score()))
+        score_str = "Score: {:010d}".format(self.tetris.get_score())
+        self.side_board.itemconfig(self.score, text=score_str)
 
     def gui_game_start(self, key):
         if key.char == 'a':
