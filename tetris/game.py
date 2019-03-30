@@ -59,7 +59,7 @@ class Game(Env):
             reward:     score
             done:       if game over
         """
-        if self.game_over:
+        if self.game_over or self.piece is None:
             return (self.main_board, self.next_queue_state()), self.score, self.game_over
         if action == 1:
             shape, pos, index = self.piece.try_move_left()
@@ -81,7 +81,10 @@ class Game(Env):
             if action == 3:
                 s, p = self.piece.get()
                 self.land_piece(s, p)
-        return (self.look_board(), self.next_queue_state()), self.score, self.game_over
+        if self.game_over:
+            return (self.main_board, self.next_queue_state()), self.score, self.game_over
+        else:
+            return (self.look_board(), self.next_queue_state()), self.score, self.game_over
 
     def reset(self):
         self.init_game()

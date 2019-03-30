@@ -12,8 +12,6 @@ GUI_WIDTH = 800
 GUI_HEIGHT = 800
 # Frame per second
 FPS=30
-# auto drop interval in ms
-DROP_INTERVAL = 1000
 
 RED         = "#eb3323"
 GREEN       = "#7ea956"
@@ -25,12 +23,14 @@ PURPLE      = "#693799"
 BLACK       = "#000000"
 
 class GameGUI(object):
-    def __init__(self):
+    def __init__(self, drop_interval=1000):
         # Init tetris game core
         self.tetris = Game(gui=True)
         self.game_started = False
-        self.last_drop = 0
+        self.drop_interval = drop_interval
+        self.first_game = True
         self.next_queue_items = []
+        self.game_over_banner = None
         self.shape_block_border = int(GUI_HEIGHT/400)
         self.shape_block_unit = int(GUI_HEIGHT/20)
         self.shape_block_size = int(GUI_HEIGHT/20) - 2*self.shape_block_border
@@ -54,6 +54,8 @@ class GameGUI(object):
         menubar.add_cascade(label = "Tetris", menu = tetrismenu)
         tetrismenu.add_command(label="Start", command=self.start_game)
         tetrismenu.add_command(label="Quit", command=self.window.quit)
+        # game over banner
+        self.game_over_banner = None
         # Init side board
         self.side_board = Canvas(
                             self.window,
@@ -91,9 +93,8 @@ l : hold"""
                             self.shape_block_unit*4+2*self.next_queue_offset,
                             outline=BLACK, fill=BLACK)
         # Bind events
-        self.window.bind("<KeyPress>", self.gui_game_start)
+        self.window.bind("<KeyPress>", self.gui_key_stroke)
         self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
-        tetrismenu.bind("<Button-1>", self.stop_game)
 
     def on_closing(self):
         self.window.quit()
@@ -102,29 +103,32 @@ l : hold"""
         score_str = "Score: {:010d}".format(self.tetris.get_score())
         self.side_board.itemconfig(self.score, text=score_str)
 
-    def gui_game_start(self, key):
+    def gui_key_stroke(self, key):
         if key.char == 'a':
             #print("move left")
-            self.tetris.step(1)
+            _, _, done = self.tetris.step(1)
         elif key.char == 's':
             #print("move down")
-            self.tetris.step(3)
+            _, _, done = self.tetris.step(3)
         elif key.char == 'd':
             #print("move right")
-            self.tetris.step(2)
+            _, _, done = self.tetris.step(2)
         elif key.char == 'w':
             #print("hard drop")
-            self.tetris.step(4)
+            _, _, done = self.tetris.step(4)
         elif key.char == 'j':
             #print("rotate counter clock-wise")
-            self.tetris.step(5)
+            _, _, done = self.tetris.step(5)
         elif key.char == 'k':
             #print("rotate clock-wise")
-            self.tetris.step(6)
+            _, _, done = self.tetris.step(6)
         elif key.char == 'l':
             #print("hold")
-            self.tetris.step(7)
-
+            _, _, done = self.tetris.step(7)
+        else:
+            return
+        if done:
+            self.game_over()
 
     def draw_mainboard(self, main_board):
         # first delete all old items on main board
@@ -226,7 +230,7 @@ l : hold"""
 
     def auto_drop(self):
         self.tetris.step(3)
-        self.window.after(DROP_INTERVAL, self.auto_drop)
+        self.window.after(self.drop_interval, self.auto_drop)
 
     def play(self):
         self.init_gui()
@@ -236,7 +240,16 @@ l : hold"""
     def start_game(self):
         self.game_started = True
         self.tetris.reset()
-        self.auto_drop()
+        if self.game_over_banner is not None:
+            self.main_board.delete(self.game_over_banner)
+        if self.first_game:
+            self.auto_drop()
+        self.first_game = False
 
-    def stop_game(self):
+    def game_over(self):
+        self.game_over_banner = self.main_board.create_text(GUI_WIDTH/4,
+                                                GUI_HEIGHT/2,
+                                                text="Game Over",
+                                                fill="white",
+                                                font="Helvetica 40 bold")
         self.game_started = False
