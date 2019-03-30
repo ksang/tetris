@@ -32,7 +32,9 @@ It is currently work in progress.
 
     python3 play.py
 
-![gui](/imgs/gui.png "GUI")
+<p align="center">
+  <img src="/imgs/gui.jpg" alt="GUI"/>
+</p>
 
 ### TODOs:
 
