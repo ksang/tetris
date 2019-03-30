@@ -38,7 +38,7 @@ It is currently work in progress.
 
 ### TODOs:
 
-- implement hard drop
 - implement hold and dequeue
 - support boundary rotation
 - support T-spin
+- agent play visualization

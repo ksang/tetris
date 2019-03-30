@@ -67,6 +67,13 @@ class Game(Env):
             shape, pos, index = self.piece.try_move_right()
         elif action == 3:
             shape, pos, index = self.piece.try_move_down()
+        elif action == 4:
+            while True:
+                shape, pos, index = self.piece.try_move_down()
+                if self.check_piece(shape, pos):
+                    self.piece.commit(pos, index)
+                else:
+                    break
         elif action == 5:
             shape, pos, index = self.piece.try_rotate_counter_clockwise()
         elif action == 6:
@@ -106,7 +113,11 @@ class Game(Env):
 
     def land_piece(self, shape, pos):
         """
-        piece landed to board, save info to board and check clear lines
+        piece landed to board, this can happen when piece try to move down.
+        save info to board and check clear lines.
+        input:
+            shape:  ndarray that represents the shape
+            pos:    the top/left piece position on board
         """
         for i, line in enumerate(shape):
             for j, v in enumerate(line):
