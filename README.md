@@ -38,6 +38,5 @@ It is currently work in progress.
 
 ### TODOs:
 
-- implement hold and dequeue
 - gym action space interfaces
 - agent play visualization

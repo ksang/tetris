@@ -14,6 +14,7 @@ class Game(Env):
     Important Members:
         score:      score of current game
         piece:      current tetromino piece that player is controlling
+        held_piece: piece that in the hold queue
         main_board: tetris game board (10x22), 2 rows are invisible to player
         next_queue: shapes that will be spawned in next steps
     """
@@ -24,7 +25,11 @@ class Game(Env):
     def init_game(self):
         self.score = 0
         self.piece = None
+        self.held_piece = None
+        # flag that indicates if current game is over
         self.game_over = False
+        # flag that indicates if current piece is swapped of hold queue
+        self.swapped = False
         # Initalize board
         self.main_board = np.zeros(shape=(10,22), dtype=int)
         # Initialize next queue
@@ -82,6 +87,25 @@ class Game(Env):
             shape, pos, index = self.piece.try_rotate_counter_clockwise()
         elif action == 6:
             shape, pos, index = self.piece.try_rotate_clockwise()
+        # hold queue operations
+        elif action == 7:
+            # already swapped this turn, do nothing
+            if self.swapped:
+                pass
+            # hold queue is empty
+            elif self.held_piece is None:
+                self.piece.reset()
+                self.held_piece = self.piece
+                self.piece = None
+                self.spawn_piece()
+            else:
+                tmp = self.held_piece
+                self.piece.reset()
+                self.held_piece = self.piece
+                self.piece = tmp
+            shape, pos = self.piece.get()
+            index = self.piece.index
+            self.swapped = True
         # ignore other actions
         else:
             return (self.look_board(), self.next_queue_state()), self.score, self.game_over
@@ -132,6 +156,8 @@ class Game(Env):
                     self.main_board[pos[0]+i, pos[1]+j] = v
         self.clear_lines(pos)
         self.piece = None
+        # reset hold queue flag
+        self.swapped = False
         self.spawn_piece()
 
     def clear_lines(self, pos):

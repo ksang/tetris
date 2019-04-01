@@ -171,6 +171,10 @@ class Piece(object):
         self.pos = pos
         self.index = index
 
+    def reset(self):
+        self.index = 0
+        self.pos = [3, 0]
+
     def try_move_down(self):
         """
         Try to move piece down one block
