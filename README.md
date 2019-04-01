@@ -39,6 +39,5 @@ It is currently work in progress.
 ### TODOs:
 
 - implement hold and dequeue
-- support boundary rotation
-- support T-spin
+- gym action space interfaces
 - agent play visualization

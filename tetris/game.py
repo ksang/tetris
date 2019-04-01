@@ -92,6 +92,12 @@ class Game(Env):
             if action == 3 or action == 4:
                 s, p = self.piece.get()
                 self.land_piece(s, p)
+            # rotate failed, check spins
+            elif action == 5 or action == 6:
+                if self.check_piece(shape, (pos[0]+1, pos[1])):
+                    self.piece.commit((pos[0]+1, pos[1]), index)
+                elif self.check_piece(shape, (pos[0]-1, pos[1])):
+                    self.piece.commit((pos[0]-1, pos[1]), index)
         return (self.look_board(), self.next_queue_state()), self.score, self.game_over
 
     def reset(self):
