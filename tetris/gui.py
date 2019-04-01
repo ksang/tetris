@@ -25,7 +25,7 @@ BLACK       = "#000000"
 class GameGUI(object):
     def __init__(self, drop_interval=1000):
         # Init tetris game core
-        self.tetris = Game(gui=True)
+        self.tetris = Game()
         self.game_started = False
         self.drop_interval = drop_interval
         self.first_game = True
@@ -71,11 +71,11 @@ w : hard drop
 j : rotate counter-clockwise
 k : rotate clockwise
 l : hold"""
-        self.side_board.create_text(int(GUI_HEIGHT*3/8), 80, text=help_text)
+        self.side_board.create_text(int(GUI_WIDTH*11/32), 80, text=help_text)
         # Display score
-        self.score = self.side_board.create_text(92, GUI_HEIGHT-12,
+        self.score = self.side_board.create_text(int(GUI_WIDTH/4), GUI_HEIGHT-12,
                                         text="Score: 0000000000",
-                                        font="Helvetica 20 bold")
+                                        font="Helvetica 16 bold")
 
         # Next queue backgrounds
         self.side_board.create_rectangle(0,0,

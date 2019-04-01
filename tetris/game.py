@@ -9,12 +9,15 @@ from tetromino import Piece
 class Game(Env):
     """
     Tetris game environment that represents the core of tetris.
-    gui:            if GUI mode is enabled
-    drop_interval:  interval in second for tetromino natually drops
+    Inputs:
+        next_queue_size:   the length of next tertromino queue size
+    Important Members:
+        score:      score of current game
+        piece:      current tetromino piece that player is controlling
+        main_board: tetris game board (10x22), 2 rows are invisible to player
+        next_queue: shapes that will be spawned in next steps
     """
-    def __init__(self, gui=False, drop_interval=1.0, next_queue_size=5):
-        self.gui = gui
-        self.drop_interval = drop_interval
+    def __init__(self, next_queue_size=5):
         self.next_queue_size = next_queue_size
         self.init_game()
 
@@ -23,23 +26,24 @@ class Game(Env):
         self.piece = None
         self.game_over = False
         # Initalize board
-        self.main_board = np.zeros(shape=(10,20), dtype=int)
+        self.main_board = np.zeros(shape=(10,22), dtype=int)
         # Initialize next queue
         self.next_queue = []
         for i in range(self.next_queue_size):
             self.next_queue.append(Piece(np.random.randint(7)))
 
     def next_queue_state(self):
+        """
+        returns shapes in ndarray of next queue.
+        """
         nq = []
         for s in self.next_queue:
-            s, p = s.get()
+            s, _ = s.get()
             nq.append(s)
         return np.array(nq)
 
     def render(self, mode='human', close=False):
         if mode == 'gui':
-            if self.game_over:
-                return self.main_board, self.next_queue_state(), self.score
             return self.look_board(), self.next_queue_state(), self.score
 
     def step(self, action):
@@ -60,7 +64,7 @@ class Game(Env):
             done:       if game over
         """
         if self.game_over or self.piece is None:
-            return (self.main_board, self.next_queue_state()), self.score, self.game_over
+            return (self.look_board(), self.next_queue_state()), self.score, self.game_over
         if action == 1:
             shape, pos, index = self.piece.try_move_left()
         elif action == 2:
@@ -85,13 +89,10 @@ class Game(Env):
             self.piece.commit(pos, index)
         else:
             # move down failed, piece landed
-            if action == 3:
+            if action == 3 or action == 4:
                 s, p = self.piece.get()
                 self.land_piece(s, p)
-        if self.game_over:
-            return (self.main_board, self.next_queue_state()), self.score, self.game_over
-        else:
-            return (self.look_board(), self.next_queue_state()), self.score, self.game_over
+        return (self.look_board(), self.next_queue_state()), self.score, self.game_over
 
     def reset(self):
         self.init_game()
@@ -133,7 +134,7 @@ class Game(Env):
         """
         top = pos[1]
         lines = []
-        for j in range(top, min(top+4, 20)):
+        for j in range(top, min(top+4, 22)):
             for i in range(0, 10):
                 if self.main_board[i, j] == 0:
                     break
@@ -164,22 +165,24 @@ class Game(Env):
 
     def look_board(self):
         """
-        look at main board with piece.
-        returns main board np array with the piece.
+        look at main board with current moving piece.
+        only returns board that visible to player (10x20)
         """
-        if self.piece == None:
-            return self.main_board
-        shape, pos = self.piece.get()
         board = self.main_board.copy()
-        for i, line in enumerate(shape):
-            for j, v in enumerate(line):
-                if v > 0:
-                    assert board[pos[0]+i, pos[1]+j] == 0, 'piece conflict on board'
-                    board[pos[0]+i, pos[1]+j] = v
-        return board
+        if self.piece is not None and self.game_over is False:
+            shape, pos = self.piece.get()
+            for i, line in enumerate(shape):
+                for j, v in enumerate(line):
+                    if v > 0:
+                        assert board[pos[0]+i, pos[1]+j] == 0, 'piece conflict on board'
+                        board[pos[0]+i, pos[1]+j] = v
+        return board[:,2:]
 
     def check_boundry(self, x, y):
-        if x >= 0 and x <= 9 and y >= 0 and y <= 19:
+        """
+        Check if piece is outside of board boundary.
+        """
+        if x >= 0 and x <= 9 and y >= 0 and y <= 21:
             return True
         return False
 
