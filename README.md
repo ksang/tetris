@@ -4,8 +4,6 @@
 
 This work aims to build a modern Tetris game that can interact with Reinforcement Learning agents. It can be also played by human and supports features such as **hard** **drop**, **hold** **queue** and **T-spin**.
 
-It is currently work in progress.
-
 ### Actions
 
     0 : noop
@@ -21,21 +19,27 @@ It is currently work in progress.
 
     pip install -r requirements.txt
 
-### Import as Gym RL environment
+### Agent play with Gym RL environment
 
     import tetris
     env = tetris.Game()
-    env.reset()
+    (initial_board, initial_next_queue) = env.reset()
     (board, next_queue), score, done = env.step(env.action_space.sample())
 
-### GUI mode, human playable
+### Agent play with GUI visualization
+
+    import tetris
+    gui = tetris.GameGUI(mode='agent')
+    env = gui.get_env()
+    gui.play()
+    # this will implicitly reset env
+    (initial_board, initial_next_queue) = gui.start_game()
+    (board, next_queue), score, done = env.step(env.action_space.sample())
+
+### GUI mode, human play
 
     python3 play.py
 
 <p align="center">
   <img src="/imgs/gui.jpg" alt="GUI"/>
 </p>
-
-### TODOs:
-
-- agent play visualization

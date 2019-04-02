@@ -6,7 +6,7 @@ from tkinter import Canvas, Label, Tk, Text, Menu
 from game import Game
 import numpy as np
 import time
-
+import threading
 
 GUI_WIDTH = 800
 GUI_HEIGHT = 800
@@ -23,9 +23,16 @@ PURPLE      = "#693799"
 BLACK       = "#000000"
 
 class GameGUI(object):
-    def __init__(self, drop_interval=1000):
+    """
+    Tetris game GUI environment that draws tetris board.
+    modes:
+        human:      interactive mode played by human
+        agent:      played by RL agents
+    """
+    def __init__(self, drop_interval=1000, mode='human'):
         # Init tetris game core
         self.tetris = Game()
+        self.mode = mode
         self.game_started = False
         self.drop_interval = drop_interval
         self.first_game = True
@@ -71,7 +78,8 @@ w : hard drop
 j : rotate counter-clockwise
 k : rotate clockwise
 l : hold"""
-        self.side_board.create_text(int(GUI_WIDTH*11/32), 80, text=help_text)
+        if self.mode == 'human':
+            self.side_board.create_text(int(GUI_WIDTH*11/32), 80, text=help_text)
         # Display score
         self.score = self.side_board.create_text(int(GUI_WIDTH/4), GUI_HEIGHT-12,
                                         text="Score: 0000000000",
@@ -93,11 +101,14 @@ l : hold"""
                             self.shape_block_unit*4+2*self.next_queue_offset,
                             outline=BLACK, fill=BLACK)
         # Bind events
-        self.window.bind("<KeyPress>", self.gui_key_stroke)
-        self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
+        if self.mode == 'human':
+            self.window.bind("<KeyPress>", self.gui_key_stroke)
 
-    def on_closing(self):
-        self.window.quit()
+    def close(self):
+        self.window.destroy()
+
+    def get_env(self):
+        return self.tetris
 
     def update_score(self):
         score_str = "Score: {:010d}".format(self.tetris.get_score())
@@ -235,16 +246,19 @@ l : hold"""
     def play(self):
         self.init_gui()
         self.draw()
-        self.window.mainloop()
+        if self.mode == 'human':
+            self.window.mainloop()
+        else:
+            threading.Thread(target=self.window.mainloop)
 
     def start_game(self):
         self.game_started = True
-        self.tetris.reset()
         if self.game_over_banner is not None:
             self.main_board.delete(self.game_over_banner)
-        if self.first_game:
+        if self.first_game and self.mode == 'human':
             self.auto_drop()
         self.first_game = False
+        return self.tetris.reset()
 
     def game_over(self):
         self.game_over_banner = self.main_board.create_text(GUI_WIDTH/4,
