@@ -2,6 +2,7 @@ import sys,os
 sys.path.append(os.path.join(os.path.dirname(__file__), "."))
 
 from gym import Env
+from gym.spaces import Discrete
 import numpy as np
 from tetromino import Piece
 
@@ -20,6 +21,7 @@ class Game(Env):
     """
     def __init__(self, next_queue_size=5):
         self.next_queue_size = next_queue_size
+        self.action_space = Discrete(7)
         self.init_game()
 
     def init_game(self):

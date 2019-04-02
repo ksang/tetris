@@ -26,7 +26,7 @@ It is currently work in progress.
     import tetris
     env = tetris.Game()
     env.reset()
-    (board, next_queue), score, done = env.step(1)
+    (board, next_queue), score, done = env.step(env.action_space.sample())
 
 ### GUI mode, human playable
 
@@ -38,5 +38,4 @@ It is currently work in progress.
 
 ### TODOs:
 
-- gym action space interfaces
 - agent play visualization
