@@ -21,7 +21,7 @@ class Game(Env):
     """
     def __init__(self, next_queue_size=5):
         self.next_queue_size = next_queue_size
-        self.action_space = Discrete(7)
+        self.action_space = Discrete(8)
         self.init_game()
 
     def init_game(self):
