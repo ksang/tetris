@@ -249,7 +249,11 @@ l : hold"""
         if self.mode == 'human':
             self.window.mainloop()
         else:
-            threading.Thread(target=self.window.mainloop)
+            self.start_game()
+            self.window.update()
+
+    def update_window(self):
+        self.window.update()
 
     def start_game(self):
         self.game_started = True
