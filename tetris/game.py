@@ -11,7 +11,10 @@ class Game(Env):
     """
     Tetris game environment that represents the core of tetris.
     Inputs:
-        next_queue_size:   the length of next tertromino queue size
+        next_queue_size:        the length of next tertromino queue size,
+                                default=5
+        flattened_observation:  if provide flattened observation as 1D array
+                                rather than board and next queue, default=False
     Important Members:
         score:      score of current game
         piece:      current tetromino piece that player is controlling
@@ -19,9 +22,12 @@ class Game(Env):
         main_board: tetris game board (10x22), 2 rows are invisible to player
         next_queue: shapes that will be spawned in next steps
     """
-    def __init__(self, next_queue_size=5):
+    def __init__(self, next_queue_size=5, flattened_observation=False):
         self.next_queue_size = next_queue_size
+        self.flattened_observation = flattened_observation
         self.action_space = Discrete(8)
+        # it is 10*20 because player only can see 10*20 board, top 2 lines are hidden
+        self.observation_space = Discrete(10*20+4*4*next_queue_size)
         self.init_game()
 
     def init_game(self):
@@ -124,15 +130,23 @@ class Game(Env):
                     self.piece.commit((pos[0]+1, pos[1]), index)
                 elif self.check_piece(shape, (pos[0]-1, pos[1])):
                     self.piece.commit((pos[0]-1, pos[1]), index)
-        return (self.look_board(), self.next_queue_state()), self.score, self.game_over
+        return self.get_observation(), self.score, self.game_over
 
     def reset(self):
         self.init_game()
         self.spawn_piece()
-        return (self.look_board(), self.next_queue_state())
+        return self.get_observation()
 
     def get_score(self):
         return self.score
+
+    def get_observation(self):
+        """
+        Convert observation to desired shape
+        """
+        if self.flattened_observation:
+            return np.concatenate((self.look_board().reshape(-1,), self.next_queue_state().reshape(-1,)))
+        return (self.look_board(), self.next_queue_state())
 
     def spawn_piece(self):
         if self.game_over:
