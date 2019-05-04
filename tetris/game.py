@@ -130,6 +130,9 @@ class Game(Env):
                     self.piece.commit((pos[0]+1, pos[1]), index)
                 elif self.check_piece(shape, (pos[0]-1, pos[1])):
                     self.piece.commit((pos[0]-1, pos[1]), index)
+            # hold queue/dequeue failed, game over
+            elif action == 7:
+                self.game_over = True
         return self.get_observation(), self.score, self.game_over
 
     def reset(self):
