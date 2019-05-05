@@ -74,10 +74,10 @@ class Game(Env):
             7 : hold/dequeue
         return:
             state:      (main_board, next_queue)
-            reward:     score
+            reward:     score increased by this action
             done:       if game over
         """
-        proposed_score = 0
+        reward = 0
         if self.game_over or self.piece is None:
             return (self.look_board(), self.next_queue_state()), self.score, self.game_over
         if action == 1:
@@ -92,6 +92,7 @@ class Game(Env):
                 shape, pos, index = self.piece.try_move_down()
                 if self.check_piece(shape, pos):
                     self.score += self.down_step_score
+                    reward += self.down_step_score
                     self.piece.commit(pos, index)
                 else:
                     break
@@ -120,15 +121,15 @@ class Game(Env):
             self.swapped = True
         # ignore other actions
         else:
-            return (self.look_board(), self.next_queue_state()), self.score, self.game_over
+            return (self.look_board(), self.next_queue_state()), reward, self.game_over
         if self.check_piece(shape, pos):
-            self.score += proposed_score
+            self.score += reward
             self.piece.commit(pos, index)
         else:
             # move down failed, piece landed
             if action == 3 or action == 4:
                 s, p = self.piece.get()
-                self.land_piece(s, p)
+                reward += self.land_piece(s, p)
             # rotate failed, check spins
             elif action == 5 or action == 6:
                 if self.check_piece(shape, (pos[0]+1, pos[1])):
@@ -138,7 +139,7 @@ class Game(Env):
             # hold queue/dequeue failed, game over
             elif action == 7:
                 self.game_over = True
-        return self.get_observation(), self.score, self.game_over
+        return self.get_observation(), reward, self.game_over
 
     def reset(self):
         self.init_game()
@@ -173,20 +174,24 @@ class Game(Env):
         input:
             shape:  ndarray that represents the shape
             pos:    the top/left piece position on board
+        return:
+            bonus:  score increased by this land_piece action
         """
         for i, line in enumerate(shape):
             for j, v in enumerate(line):
                 if v > 0:
                     self.main_board[pos[0]+i, pos[1]+j] = v
-        self.clear_lines(pos)
+        bonus = self.clear_lines(pos)
         self.piece = None
         # reset hold queue flag
         self.swapped = False
         self.spawn_piece()
+        return bonus
 
     def clear_lines(self, pos):
         """
         check board to see if there are lines need to be cleared
+        return score increased by this land_piece action
         """
         top = pos[1]
         lines = []
@@ -198,7 +203,7 @@ class Game(Env):
                     lines.append(j)
         clear_num = len(lines)
         if clear_num == 0:
-            return
+            return 0
         for j in reversed(range(0, lines[-1]+1)):
             if j > clear_num-1:
                 for i in range(0, 10):
@@ -206,18 +211,21 @@ class Game(Env):
             else:
                 for i in range(0, 10):
                     self.main_board[i, j] = 0
-        self.scoring(clear_num)
+        return self.scoring(clear_num)
 
     def scoring(self, num_lines, type='basic'):
+        bonus = 0
         if type == 'basic':
             if num_lines == 1:
-                self.score += 40
+                bonus = 40
             elif num_lines == 2:
-                self.score += 100
+                bonus = 100
             elif num_lines == 3:
-                self.score += 300
+                bonus = 300
             elif num_lines == 4:
-                self.score += 1200
+                bonus = 1200
+        self.score += bonus
+        return bonus
 
     def look_board(self):
         """
