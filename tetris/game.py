@@ -28,6 +28,7 @@ class Game(Env):
         self.action_space = Discrete(8)
         # it is 10*20 because player only can see 10*20 board, top 2 lines are hidden
         self.observation_space = Discrete(10*20+4*4*next_queue_size)
+        self.down_step_score = 1
         self.init_game()
 
     def init_game(self):
@@ -76,6 +77,7 @@ class Game(Env):
             reward:     score
             done:       if game over
         """
+        proposed_score = 0
         if self.game_over or self.piece is None:
             return (self.look_board(), self.next_queue_state()), self.score, self.game_over
         if action == 1:
@@ -84,10 +86,12 @@ class Game(Env):
             shape, pos, index = self.piece.try_move_right()
         elif action == 3:
             shape, pos, index = self.piece.try_move_down()
+            proposed_score = self.down_step_score
         elif action == 4:
             while True:
                 shape, pos, index = self.piece.try_move_down()
                 if self.check_piece(shape, pos):
+                    self.score += self.down_step_score
                     self.piece.commit(pos, index)
                 else:
                     break
@@ -118,6 +122,7 @@ class Game(Env):
         else:
             return (self.look_board(), self.next_queue_state()), self.score, self.game_over
         if self.check_piece(shape, pos):
+            self.score += proposed_score
             self.piece.commit(pos, index)
         else:
             # move down failed, piece landed
