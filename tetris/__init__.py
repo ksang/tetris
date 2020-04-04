@@ -1,2 +1,2 @@
 from .gui import GameGUI
-from .game import Game
+from .game import Tetris

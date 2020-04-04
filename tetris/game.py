@@ -7,7 +7,7 @@ import numpy as np
 from tetromino import Piece
 
 
-class Game(Env):
+class Tetris(Env):
     """
     Tetris game environment that represents the core of tetris.
     Inputs:
@@ -58,6 +58,12 @@ class Game(Env):
     def render(self, mode='human', close=False):
         if mode == 'gui':
             return self.look_board(), self.next_queue_state(), self.score
+        print("Main board:")
+        print(np.rot90(self.look_board(), 3))
+        print("Next queue:")
+        print(self.next_queue_state())
+        print("Score:")
+        print(self.score)
 
     def step(self, action):
         """

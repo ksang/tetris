@@ -22,7 +22,7 @@ This work aims to build a modern Tetris game that can interact with Reinforcemen
 ### Agent play with Gym RL environment
 
     import tetris
-    env = tetris.Game()
+    env = tetris.Tetris()
     (initial_board, initial_next_queue) = env.reset()
     (board, next_queue), score, done = env.step(env.action_space.sample())
 

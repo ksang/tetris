@@ -3,7 +3,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "."))
 
 import tkinter as tk
 from tkinter import Canvas, Label, Tk, Text, Menu
-from game import Game
+from game import Tetris
 import numpy as np
 import time
 import threading
@@ -31,7 +31,7 @@ class GameGUI(object):
     """
     def __init__(self, drop_interval=1000, mode='human'):
         # Init tetris game core
-        self.tetris = Game()
+        self.tetris = Tetris()
         self.mode = mode
         self.game_started = False
         self.drop_interval = drop_interval
