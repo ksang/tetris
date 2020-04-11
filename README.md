@@ -3,6 +3,7 @@
 ### About
 
 This work aims to build a modern Tetris game that can interact with Reinforcement Learning agents. It can be also played by human and supports features such as **hard** **drop**, **hold** **queue** and **T-spin**.
+
 ### States
 
 Two np array:
