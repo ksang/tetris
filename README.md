@@ -3,17 +3,23 @@
 ### About
 
 This work aims to build a modern Tetris game that can interact with Reinforcement Learning agents. It can be also played by human and supports features such as **hard** **drop**, **hold** **queue** and **T-spin**.
+### States
+
+Two np array:
+- main board: (10, 20)
+- next queue: (5, 4, 4), 5 Tetromino
 
 ### Actions
 
-    0 : noop
-    1 : move left
-    2 : move right
-    3 : move down
-    4 : hard drop
-    5 : rotate counter-clockwise
-    6 : rotate clockwise
-    7 : hold/dequeue
+Discrete, 8 actions:
+- 0 : noop
+- 1 : move left
+- 2 : move right
+- 3 : move down
+- 4 : hard drop
+- 5 : rotate counter-clockwise
+- 6 : rotate clockwise
+- 7 : hold/dequeue
 
 ### Install dependencies
 
