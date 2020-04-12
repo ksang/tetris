@@ -11,6 +11,8 @@ class Tetris(Env):
     """
     Tetris game environment that represents the core of tetris.
     Inputs:
+        horizon:                the max number of steps for an episode,
+                                default = 5000, -1 means infinity
         next_queue_size:        the length of next tertromino queue size,
                                 default=5
         flattened_observation:  if provide flattened observation as 1D array
@@ -22,7 +24,9 @@ class Tetris(Env):
         main_board: tetris game board (10x22), 2 rows are invisible to player
         next_queue: shapes that will be spawned in next steps
     """
-    def __init__(self, next_queue_size=5, flattened_observation=False):
+    def __init__(self, horizon=5000, next_queue_size=5, flattened_observation=False):
+        self.horizon = horizon
+        self.t = 0
         self.next_queue_size = next_queue_size
         self.flattened_observation = flattened_observation
         self.action_space = Discrete(8)
@@ -33,6 +37,7 @@ class Tetris(Env):
 
     def init_game(self):
         self.score = 0
+        self.t = 0
         self.piece = None
         self.held_piece = None
         # flag that indicates if current game is over
@@ -145,6 +150,9 @@ class Tetris(Env):
             # hold queue/dequeue failed, game over
             elif action == 7:
                 self.game_over = True
+        self.t += 1
+        if self.horizon >= 0 and self.t >= self.horizon:
+            self.game_over = True 
         return self.get_observation(), reward, self.game_over
 
     def reset(self):

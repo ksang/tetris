@@ -29,9 +29,9 @@ class GameGUI(object):
         human:      interactive mode played by human
         agent:      played by RL agents
     """
-    def __init__(self, drop_interval=1000, mode='human'):
+    def __init__(self, horizon=-1, drop_interval=1000, mode='human'):
         # Init tetris game core
-        self.tetris = Tetris()
+        self.tetris = Tetris(horizon)
         self.mode = mode
         self.game_started = False
         self.drop_interval = drop_interval
