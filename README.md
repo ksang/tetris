@@ -28,6 +28,8 @@ Discrete, 8 actions:
 
 ### Agent play with Gym RL environment
 
+By default, horizon is set to 5000 steps for an episode.
+
     import tetris
     env = tetris.Tetris()
     (initial_board, initial_next_queue) = env.reset()
