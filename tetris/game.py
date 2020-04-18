@@ -3,6 +3,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "."))
 
 from gym import Env
 from gym.spaces import Discrete
+from gym.spaces import Box
 import numpy as np
 from tetromino import Piece
 
@@ -31,7 +32,7 @@ class Tetris(Env):
         self.flattened_observation = flattened_observation
         self.action_space = Discrete(8)
         # it is 10*20 because player only can see 10*20 board, top 2 lines are hidden
-        self.observation_space = Discrete(10*20+4*4*next_queue_size)
+        self.observation_space = Box(0, 7, (10*20+4*4*next_queue_size,), np.int8)
         self.down_step_score = 1
         self.init_game()
 
@@ -152,7 +153,7 @@ class Tetris(Env):
                 self.game_over = True
         self.t += 1
         if self.horizon >= 0 and self.t >= self.horizon:
-            self.game_over = True 
+            self.game_over = True
         return self.get_observation(), reward, self.game_over
 
     def reset(self):
