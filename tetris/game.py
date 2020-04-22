@@ -133,7 +133,7 @@ class Tetris(Env):
             self.swapped = True
         # ignore other actions
         else:
-            return (self.look_board(), self.next_queue_state()), reward, self.game_over
+            return self.get_observation(), reward, self.game_over
         if self.check_piece(shape, pos):
             self.score += reward
             self.piece.commit(pos, index)
