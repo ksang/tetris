@@ -91,7 +91,7 @@ class Tetris(Env):
         """
         reward = 0
         if self.game_over or self.piece is None:
-            return (self.look_board(), self.next_queue_state()), self.score, self.game_over
+            return self.get_observation(), reward, self.game_over
         if action == 1:
             shape, pos, index = self.piece.try_move_left()
         elif action == 2:
