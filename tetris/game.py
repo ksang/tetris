@@ -33,7 +33,7 @@ class Tetris(Env):
         self.action_space = Discrete(8)
         if self.flattened_observation:
             # it is 10*20 because player only can see 10*20 board, top 2 lines are hidden
-            self.observation_space = Box(0, 7, (10*20+4*4*next_queue_size,), np.int8)
+            self.observation_space = Box(0, 7, (10*20+4*4*self.next_queue_size,), np.int8)
         else:
             # it is 10*20 of main board, other 12 lines are next queue with padding
             self.observation_space = Box(0, 7, (10,20+4*3), np.int8)
