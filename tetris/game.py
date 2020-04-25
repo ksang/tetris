@@ -25,14 +25,18 @@ class Tetris(Env):
         main_board: tetris game board (10x22), 2 rows are invisible to player
         next_queue: shapes that will be spawned in next steps
     """
-    def __init__(self, horizon=5000, next_queue_size=5, flattened_observation=False):
+    def __init__(self, horizon=5000, flattened_observation=False):
         self.horizon = horizon
         self.t = 0
-        self.next_queue_size = next_queue_size
+        self.next_queue_size = 5
         self.flattened_observation = flattened_observation
         self.action_space = Discrete(8)
-        # it is 10*20 because player only can see 10*20 board, top 2 lines are hidden
-        self.observation_space = Box(0, 7, (10*20+4*4*next_queue_size,), np.int8)
+        if self.flattened_observation:
+            # it is 10*20 because player only can see 10*20 board, top 2 lines are hidden
+            self.observation_space = Box(0, 7, (10*20+4*4*next_queue_size,), np.int8)
+        else:
+            # it is 10*20 of main board, other 12 lines are next queue with padding
+            self.observation_space = Box(0, 7, (10,20+4*3), np.int8)
         self.down_step_score = 1
         self.init_game()
 
@@ -170,7 +174,11 @@ class Tetris(Env):
         """
         if self.flattened_observation:
             return np.concatenate((self.look_board().reshape(-1,), self.next_queue_state().reshape(-1,)))
-        return (self.look_board(), self.next_queue_state())
+        nq = self.next_queue_state()
+        nq_1 =  np.pad(np.concatenate((nq[0], nq[1]), axis=0), ((0,2),(0,0)),'constant')
+        nq_2 =  np.pad(np.concatenate((nq[2], nq[3]), axis=0), ((0,2),(0,0)),'constant')
+        nq_3 =  np.pad(nq[4], ((0,6),(0,0)),'constant')
+        return np.concatenate((self.look_board(), nq_1, nq_2, nq_3), axis=1)
 
     def spawn_piece(self):
         if self.game_over:

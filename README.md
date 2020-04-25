@@ -6,9 +6,10 @@ This work aims to build a modern Tetris game that can interact with Reinforcemen
 
 ### States
 
-Two np array:
-- main board: (10, 20)
-- next queue: (5, 4, 4), 5 Tetromino
+Depends on initial setting `flattened_observation`:
+- **true**:  shape (280, ): contains all pixel states in 1-D array, useful for Linear (full-connected) models.
+- **false**: shape (10, 320): 2-D array concatenating main board and next queue for 5 tetromino, useful for Conv2D models.
+
 
 ### Actions
 
@@ -32,8 +33,8 @@ By default, horizon is set to 5000 steps for an episode.
 
     import tetris
     env = tetris.Tetris()
-    (initial_board, initial_next_queue) = env.reset()
-    (board, next_queue), score, done = env.step(env.action_space.sample())
+    state = env.reset()
+    state, reward, done = env.step(env.action_space.sample())
 
 ### Agent play with GUI visualization
 
@@ -42,8 +43,8 @@ By default, horizon is set to 5000 steps for an episode.
     env = gui.get_env()
     gui.play()
     # this will implicitly reset env
-    (initial_board, initial_next_queue) = gui.start_game()
-    (board, next_queue), score, done = env.step(env.action_space.sample())
+    state = gui.start_game()
+    state, reward, done = env.step(env.action_space.sample())
 
 ### GUI mode, human play
 
