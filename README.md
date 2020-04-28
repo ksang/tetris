@@ -8,7 +8,7 @@ This work aims to build a modern Tetris game that can interact with Reinforcemen
 
 Depends on initial setting `flattened_observation`:
 - **true**:  shape (280, ): contains all pixel states in 1-D array, useful for Linear (full-connected) models.
-- **false**: shape (10, 320): 2-D array concatenating main board and next queue for 5 tetromino, useful for Conv2D models.
+- **false**: shape (1, 10, 320): 2-D array (1 channel) concatenating main board and next queue for 5 tetromino, useful for Conv2D models.
 
 
 ### Actions

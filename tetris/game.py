@@ -178,7 +178,8 @@ class Tetris(Env):
         nq_1 =  np.pad(np.concatenate((nq[0], nq[1]), axis=0), ((0,2),(0,0)),'constant')
         nq_2 =  np.pad(np.concatenate((nq[2], nq[3]), axis=0), ((0,2),(0,0)),'constant')
         nq_3 =  np.pad(nq[4], ((0,6),(0,0)),'constant')
-        return np.concatenate((self.look_board(), nq_1, nq_2, nq_3), axis=1)
+        out = np.concatenate((self.look_board(), nq_1, nq_2, nq_3), axis=1)
+        return out.reshape(1, out.shape[0], -1)
 
     def spawn_piece(self):
         if self.game_over:
